@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshID"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White">
+
+
+    <RelativeLayout
+        android:id="@+id/recyclerContainerID"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/images_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:scrollbars="vertical"
+            android:layout_alignParentLeft="true" />
+
+
+        <RelativeLayout
+            android:id="@+id/noConnectionLayoutID"
+            android:layout_width="250dp"
+            android:layout_height="300dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="119dp"
+            android:visibility="gone">
+
+
+            <ImageView
+                android:id="@+id/no_connectionImageID"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/no_connection" />
+
+            <TextView
+                android:id="@+id/text_boldID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/no_connectionImageID"
+                android:layout_centerHorizontal="true"
+                android:text="No Internet Connection"
+                android:textColor="@color/black"
+                android:textAllCaps="true"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_lightID"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/text_boldID"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:text="Check your Internet Connection and Try Again" />
+
+
+        </RelativeLayout>
+
+
+
+
+
+        <RelativeLayout
+            android:id="@+id/loadingRecyclerID"
+            android:layout_width="match_parent"
+            android:layout_height="20sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="bottom"
+            android:background="#00E676"
+            android:visibility="gone"
+            android:layout_alignParentLeft="true">
+
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:padding="2.5dp"
+                android:layout_toStartOf="@+id/loadingTextID"
+                android:indeterminate="true"
+                android:indeterminateTintMode="src_atop"
+                android:indeterminateTint="@color/black"
+                android:layout_toLeftOf="@+id/loadingTextID" />
+
+            <TextView
+                android:id="@+id/loadingTextID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:text="Loading..."
+                android:textStyle="bold" />
+
+
+        </RelativeLayout>
+
+
+
+
+    </RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
