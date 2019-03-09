@@ -1,24 +1,46 @@
 package Adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.edward.navigation01.R;
+import com.github.curioustechizen.ago.RelativeTimeTextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Locale;
+import java.util.Objects;
 
 import Fragments.FeedsFragment;
+import Models.ImageData;
 import Models.Response;
+import Models.Thumbnail;
+import Models.WpAttachmentItem;
+import Models.WpFeaturedmediaItem;
+import Retrofit.ImageDataApi;
+import retrofit2.Call;
+import retrofit2.Callback;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyViewHolder> {
 
@@ -41,11 +63,22 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView title;
+        public RelativeTimeTextView time;
+        public ImageView thumbnail;
+        public ImageButton share,bookmark;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
+
             title = (TextView) itemView.findViewById(R.id.postTitleID);
+            time = (RelativeTimeTextView) itemView.findViewById(R.id.timeTextID);
+            thumbnail = (ImageView) itemView.findViewById(R.id.imageThumbnailID);
+            share = (ImageButton) itemView.findViewById(R.id.shareButtonID);
+            bookmark = (ImageButton) itemView.findViewById(R.id.bookmarkButtonID);
+
+
+
         }
 
         @Override
@@ -67,9 +100,53 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         Response post = FeedsFragment.postList.get(position);
 
-        String postTitle = String.valueOf(post.getTitle());
-
+        final String postTitle = String.valueOf(post.getTitle().getRendered());
         holder.title.setText(postTitle);
+
+        Date date = new Date();
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            date = inputFormat.parse(post.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        holder.time.setReferenceTime(date.getTime());
+
+
+        int number = post.getFeatured_media();
+        ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
+            @Override
+            public void onResponse(Call<Thumbnail> call, retrofit2.Response<Thumbnail> response) {
+
+                Log.d(TAG,String.valueOf(response.body()));
+                Thumbnail newThumbnail = response.body();
+
+
+                if (newThumbnail!=null){
+                    Glide.with(mContext).load(newThumbnail.getSourceUrl())
+                            .thumbnail(0.5f)
+                            .transition(withCrossFade())
+                            .apply(new RequestOptions()
+                                    .centerCrop()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
+                            .into(holder.thumbnail);
+                }
+
+
+
+            }
+
+            @Override
+            public void onFailure(Call<Thumbnail> call, Throwable t) {
+
+            }
+        });
+
+
+
+
+
 
 
     }
@@ -92,6 +169,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 
     public void clearList(){
         FeedsFragment.postList.clear();
+        notifyDataSetChanged();
     }
 
     public List<Response> getItemList(){

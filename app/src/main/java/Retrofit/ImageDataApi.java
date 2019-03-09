@@ -1,39 +1,37 @@
 package Retrofit;
 
-import android.util.Log;
-
-import java.util.List;
-
 import Models.ImageData;
-import Models.MediaDetails;
-import Models.Medium;
-import Models.Response;
+import Models.Thumbnail;
+import Models.WpAttachmentItem;
+import Models.WpFeaturedmediaItem;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
+import retrofit2.http.Url;
 
-public interface DwarkawalaApi {
+public interface ImageDataApi {
 
-    String BASE_URL = "https://dwarkawala.com/wp-json/wp/v2/";
+    String BASE_URL = "https://dwarkawala.com/index.php/wp-json//wp//v2//";
+
+    @GET("media/{Id}")
+    Call<Thumbnail> getImageData(
+            @Path("Id") int postId
+    );
 
 
-    @GET("posts/")
-    Call<List<Response>> getPosts(@Query("type") String type, @Query("page") int page);
 
+    class ImageFactory {
+        private static ImageDataApi service;
+        public static ImageDataApi getInstance() {
 
-
-    class Factory {
-        private static DwarkawalaApi service;
-        public static DwarkawalaApi getInstance() {
             if (service == null) {
                 Retrofit retrofit = new Retrofit.Builder()
                         .addConverterFactory(GsonConverterFactory.create())
                         .baseUrl(BASE_URL)
                         .build();
-                service = retrofit.create(DwarkawalaApi.class);
+                service = retrofit.create(ImageDataApi.class);
                 return service;
             } else {
                 return service;

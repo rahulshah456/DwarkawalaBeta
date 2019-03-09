@@ -21,7 +21,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
-import com.example.edward.navigation01.MainActivity;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.edward.navigation01.R;
 
 import java.util.ArrayList;
@@ -30,14 +31,19 @@ import java.util.List;
 import Adapters.ConnectionDetector;
 import Adapters.PostListAdapter;
 import Models.Response;
+import Models.Thumbnail;
 import Retrofit.DwarkawalaApi;
+import Retrofit.ImageDataApi;
 import retrofit2.Call;
 import retrofit2.Callback;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class FeedsFragment extends Fragment {
 
     private static final String TAG = FeedsFragment.class.getSimpleName();
     public static List<Response> postList;
+    public static List<Thumbnail> thumbnailList;
     Context mContext;
     RecyclerView imageRecyclerView;
     ImageView noConnectionGif;
@@ -143,7 +149,7 @@ public class FeedsFragment extends Fragment {
 
     public void generateRecyclerView(){
         // Set up RecyclerView
-        postList = new ArrayList<>();
+        postList = new ArrayList<Models.Response>();
         mLayoutManager = new GridLayoutManager(mContext, 1);
         postListAdapter = new PostListAdapter(mContext);
         imageRecyclerView.setLayoutManager(mLayoutManager);
@@ -159,7 +165,8 @@ public class FeedsFragment extends Fragment {
             @Override
             public void onResponse(Call<List<Response>> call, retrofit2.Response<List<Response>> response) {
 
-                postListAdapter.addPosts(response.body());
+                List<Response> newResponse = response.body();
+                postListAdapter.addPosts(newResponse);
                 isLoading = false;
                 loadingLayout.setVisibility(View.INVISIBLE);
                 loadingLayout.startAnimation(slide_down);
@@ -176,13 +183,18 @@ public class FeedsFragment extends Fragment {
                 imageRecyclerView.setVisibility(View.GONE);
 
                 Glide.with(mContext)
-                        .load(R.drawable.no_connection)
                         .asGif()
+                        .load(R.drawable.no_connection)
                         .into(noConnectionGif);
                 connectionLost.setVisibility(View.VISIBLE);
 
             }
         });
+
+
+
+
+
 
 
     }

@@ -7,20 +7,11 @@ import com.google.gson.annotations.SerializedName;
 
 public class Links{
 
-	@SerializedName("curies")
-	private List<CuriesItem> curies;
-
 	@SerializedName("replies")
 	private List<RepliesItem> replies;
 
-	@SerializedName("version-history")
-	private List<VersionHistoryItem> versionHistory;
-
 	@SerializedName("author")
 	private List<AuthorItem> author;
-
-	@SerializedName("wp:term")
-	private List<WpTermItem> wpTerm;
 
 	@SerializedName("about")
 	private List<AboutItem> about;
@@ -28,21 +19,18 @@ public class Links{
 	@SerializedName("self")
 	private List<SelfItem> self;
 
-	@SerializedName("wp:featuredmedia")
-	private List<WpFeaturedmediaItem> wpFeaturedmedia;
-
 	@SerializedName("collection")
 	private List<CollectionItem> collection;
 
-	@SerializedName("wp:attachment")
-	private List<WpAttachmentItem> wpAttachment;
+	@SerializedName("wp:featuredmedia")
+	private List<FeatureMedia> featuredmedia;
 
-	public void setCuries(List<CuriesItem> curies){
-		this.curies = curies;
+	public List<FeatureMedia> getFeaturedmedia() {
+		return featuredmedia;
 	}
 
-	public List<CuriesItem> getCuries(){
-		return curies;
+	public void setFeaturedmedia(List<FeatureMedia> featuredmedia) {
+		this.featuredmedia = featuredmedia;
 	}
 
 	public void setReplies(List<RepliesItem> replies){
@@ -53,28 +41,12 @@ public class Links{
 		return replies;
 	}
 
-	public void setVersionHistory(List<VersionHistoryItem> versionHistory){
-		this.versionHistory = versionHistory;
-	}
-
-	public List<VersionHistoryItem> getVersionHistory(){
-		return versionHistory;
-	}
-
 	public void setAuthor(List<AuthorItem> author){
 		this.author = author;
 	}
 
 	public List<AuthorItem> getAuthor(){
 		return author;
-	}
-
-	public void setWpTerm(List<WpTermItem> wpTerm){
-		this.wpTerm = wpTerm;
-	}
-
-	public List<WpTermItem> getWpTerm(){
-		return wpTerm;
 	}
 
 	public void setAbout(List<AboutItem> about){
@@ -93,14 +65,6 @@ public class Links{
 		return self;
 	}
 
-	public void setWpFeaturedmedia(List<WpFeaturedmediaItem> wpFeaturedmedia){
-		this.wpFeaturedmedia = wpFeaturedmedia;
-	}
-
-	public List<WpFeaturedmediaItem> getWpFeaturedmedia(){
-		return wpFeaturedmedia;
-	}
-
 	public void setCollection(List<CollectionItem> collection){
 		this.collection = collection;
 	}
@@ -109,28 +73,16 @@ public class Links{
 		return collection;
 	}
 
-	public void setWpAttachment(List<WpAttachmentItem> wpAttachment){
-		this.wpAttachment = wpAttachment;
-	}
-
-	public List<WpAttachmentItem> getWpAttachment(){
-		return wpAttachment;
-	}
-
 	@Override
  	public String toString(){
 		return 
 			"Links{" + 
-			"curies = '" + curies + '\'' + 
-			",replies = '" + replies + '\'' + 
-			",version-history = '" + versionHistory + '\'' + 
+			"replies = '" + replies + '\'' + 
 			",author = '" + author + '\'' + 
-			",wp:term = '" + wpTerm + '\'' + 
 			",about = '" + about + '\'' + 
-			",self = '" + self + '\'' + 
-			",wp:featuredmedia = '" + wpFeaturedmedia + '\'' + 
-			",collection = '" + collection + '\'' + 
-			",wp:attachment = '" + wpAttachment + '\'' + 
+			",self = '" + self + '\'' +
+					",FeturedMedia = '" + featuredmedia + '\'' +
+					",collection = '" + collection + '\'' +
 			"}";
 		}
 }

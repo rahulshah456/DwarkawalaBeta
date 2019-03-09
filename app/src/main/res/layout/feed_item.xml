@@ -7,9 +7,10 @@
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_margin="12dp"
-        app:cardCornerRadius="12dp"
+        android:layout_height="320dp"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="5dp"
         android:background="#ffffff">
 
         <android.support.constraint.ConstraintLayout
@@ -17,9 +18,44 @@
             android:layout_height="match_parent">
 
 
+            <ImageView
+                android:id="@+id/imageThumbnailID"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:background="@drawable/thumbnail"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
             <TextView
                 android:id="@+id/postTitleID"
-                android:layout_width="356dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="left"
+                android:maxLines="2"
+                android:text="Post Title"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.466"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageThumbnailID"
+                app:layout_constraintVertical_bias="0.176" />
+
+
+            <com.github.curioustechizen.ago.RelativeTimeTextView
+                android:id="@+id/timeTextID"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
@@ -27,16 +63,48 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:fontFamily="@font/montserrat"
-                android:gravity="center"
-                android:text="Post Title"
-                android:textSize="24dp"
-                android:textStyle="bold"
+                android:text="2 hours ago"
+                android:textColor="@color/grey"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.533"
+                app:layout_constraintHorizontal_bias="0.012"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/postTitleID"
+                app:layout_constraintVertical_bias="0.703" />
+
+            <ImageButton
+                android:id="@+id/shareButtonID"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/share_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/bookmarkButtonID"
+                app:layout_constraintHorizontal_bias="0.934"
+                app:layout_constraintStart_toEndOf="@+id/bookmarkButtonID"
+                app:layout_constraintTop_toBottomOf="@+id/imageThumbnailID"
+                app:layout_constraintVertical_bias="0.909" />
+
+            <ImageButton
+                android:id="@+id/bookmarkButtonID"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="28dp"
+                android:layout_marginRight="28dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bookmark_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageThumbnailID"
+                app:layout_constraintVertical_bias="0.9" />
+
+
+
 
 
 
