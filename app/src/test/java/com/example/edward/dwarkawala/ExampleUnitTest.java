@@ -1,4 +1,4 @@
-package com.example.edward.navigation01;
+package com.example.edward.dwarkawala;
 
 import org.junit.Test;
 

@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.edward.navigation01.R;
+import com.example.edward.dwarkawala.R;
 
 public class DealsFragment extends Fragment {
 

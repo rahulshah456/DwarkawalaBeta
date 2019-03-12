@@ -1,4 +1,4 @@
-package com.example.edward.navigation01;
+package com.example.edward.dwarkawala;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

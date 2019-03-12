@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "170590303932",
+    "firebase_url": "https://dwarkawala-abea2.firebaseio.com",
+    "project_id": "dwarkawala-abea2",
+    "storage_bucket": "dwarkawala-abea2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170590303932:android:ca43ccee5e01c36f",
+        "android_client_info": {
+          "package_name": "com.example.edward.dwarkawala"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "170590303932-vvrgrfi4uutpkoe4n14d4lm7vls3fb46.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.edward.dwarkawala",
+            "certificate_hash": "1d52961a982070923940c3c3289adaa2ffe7a867"
+          }
+        },
+        {
+          "client_id": "170590303932-d8p07er0hh7ohlg8ifgrsp78e3t4lmjf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj_-d2D9mkwCxZ-SvmavNKE_m6Ttsk1y4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170590303932-d8p07er0hh7ohlg8ifgrsp78e3t4lmjf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

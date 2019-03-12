@@ -21,9 +21,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.example.edward.navigation01.R;
+import com.example.edward.dwarkawala.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,6 @@ import Adapters.PostListAdapter;
 import Models.Response;
 import Models.Thumbnail;
 import Retrofit.DwarkawalaApi;
-import Retrofit.ImageDataApi;
 import retrofit2.Call;
 import retrofit2.Callback;
 
