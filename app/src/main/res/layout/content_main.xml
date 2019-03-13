@@ -6,20 +6,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.edward.dwarkawala.MainActivity"
-    tools:showIn="@layout/app_bar_main">
+    tools:context="com.example.edward.dwarkawala.MainActivity">
+
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/appBarID"
+        android:background="@color/White"
+        android:elevation="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/ham_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.562" />
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/vert_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/montserrat"
+            android:text="Dwarkawala"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.514"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.142" />
+
+    </android.support.constraint.ConstraintLayout>
 
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabLayoutID"
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/appBarID"
         android:layout_width="match_parent"
         android:layout_height="42dp"
         app:tabMode="fixed"
-        android:elevation="0dp"
-        android:background="@color/colorPrimary"
+        android:elevation="5dp"
+        android:background="@color/White"
         app:tabTextColor="#d3d3d3"
-        app:tabSelectedTextColor="#ffffff"
+        app:tabSelectedTextColor="@color/black"
         app:tabIndicatorColor="@color/colorAccent" />
 
 

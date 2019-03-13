@@ -1,15 +1,24 @@
 package com.example.edward.dwarkawala;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashActivity extends AppCompatActivity {
+
+    private FirebaseAuth mAuth;
+    private static final String PREF_NAME = "dwarkawala.com";
+    public static final String PROGRESS = "progress";
+    public SharedPreferences loginProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +38,55 @@ public class SplashActivity extends AppCompatActivity {
 //            }
         }
 
+        mAuth = FirebaseAuth.getInstance();
+        loginProgress = PreferenceManager.getDefaultSharedPreferences(SplashActivity.this);
+
+
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                Intent intent = new Intent(SplashActivity.this,LoginActivity.class);
-                startActivity(intent);
+                if (mAuth.getCurrentUser()!=null){
+                    if (loginProgress.contains(PROGRESS)){
+
+                        int loginState = loginProgress.getInt(PROGRESS,0);
+
+                        switch (loginState){
+                            case 0:
+                                //User successfully verified his phone number
+                                Intent intent_one = new Intent(SplashActivity.this,CompleteAccount.class);
+                                intent_one.putExtra("phone",mAuth.getCurrentUser().getPhoneNumber());
+                                intent_one.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent_one);
+                                break;
+                            case 1:
+                                //User successfully completed registration
+                                Intent intent_two = new Intent(SplashActivity.this,MainActivity.class);
+                                intent_two.putExtra("phone",mAuth.getCurrentUser().getPhoneNumber());
+                                intent_two.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent_two);
+                                break;
+                        }
+
+                    }else {
+
+                        Intent intent = new Intent(SplashActivity.this,MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+
+                    }
+
+                }else {
+
+                    Intent intent = new Intent(SplashActivity.this,LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+
+                }
+
+
+
 
             }
         },1500);

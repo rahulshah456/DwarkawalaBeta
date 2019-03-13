@@ -1,23 +1,49 @@
 package Models;
 
-public class Customer {
+public class AccountData {
 
     public String name;
     public String email;
     public String phoneNumber;
     public String profilePic;
-    public String location;
+    public String latitude;
+    public String longitude;
 
 
-    public Customer() {
+    public AccountData() {
     }
 
-    public Customer(String name, String email, String phoneNumber, String profilePic, String location) {
+
+    public AccountData(String name, String email, String phoneNumber, String profilePic, String latitude, String longitude) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePic = profilePic;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public AccountData(String name, String email, String phoneNumber, String profilePic) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.profilePic = profilePic;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     public String getName() {
@@ -50,13 +76,5 @@ public class Customer {
 
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 }
