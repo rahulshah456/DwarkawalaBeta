@@ -8,6 +8,7 @@ public class AccountData {
     public String profilePic;
     public String latitude;
     public String longitude;
+    public String password;
 
 
     public AccountData() {
@@ -21,6 +22,17 @@ public class AccountData {
         this.profilePic = profilePic;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+
+    public AccountData(String name, String email, String phoneNumber, String profilePic, String latitude, String longitude, String password) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.profilePic = profilePic;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.password = password;
     }
 
     public AccountData(String name, String email, String phoneNumber, String profilePic) {
@@ -76,5 +88,13 @@ public class AccountData {
 
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

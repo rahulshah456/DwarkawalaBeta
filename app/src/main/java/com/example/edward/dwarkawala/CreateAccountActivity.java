@@ -95,6 +95,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                         Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.CAMERA},
                 REQUEST_CODE_ASK_PERMISSIONS);
 
+
+
+
         phoneAuthProvider = PhoneAuthProvider.getInstance();
         phoneNumberText = (TextInputEditText) findViewById(R.id.phoneEditTextID);
         sendOtp = (CardView) findViewById(R.id.otpID);

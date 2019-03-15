@@ -10,9 +10,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import Adapters.HomePagerAdapter;
 
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private HomePagerAdapter pagerAdapter;
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager.setAdapter(pagerAdapter);
         tabLayout = (TabLayout) findViewById(R.id.tabLayoutID);
         tabLayout.setupWithViewPager(viewPager);
+        mAuth = FirebaseAuth.getInstance();
 
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

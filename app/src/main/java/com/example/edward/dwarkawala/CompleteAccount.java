@@ -58,6 +58,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
@@ -227,12 +228,19 @@ public class CompleteAccount extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Location location) {
                                         //TODO: UI updates.
-                                        longitude = location.getLongitude();
-                                        latitude = location.getLatitude();
+                                        if (location!=null){
+                                            longitude = location.getLongitude();
+                                            latitude = location.getLatitude();
+                                        }
 
                                         progressDialog.show();
-                                        createNewUserTask.execute();
-
+                                        mAuth.createUserWithEmailAndPassword(email.getText().toString(),password.getText().toString())
+                                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                                    @Override
+                                                    public void onSuccess(AuthResult authResult) {
+                                                        createNewUserTask.execute();
+                                                    }
+                                                });
 
                                     }
                                 });
@@ -542,6 +550,7 @@ public class CompleteAccount extends AppCompatActivity {
                                         databaseReference.child(uploadId).child("profilePic").setValue(uri.toString());
                                         databaseReference.child(uploadId).child("latitude").setValue(String.valueOf(latitude));
                                         databaseReference.child(uploadId).child("longitude").setValue(String.valueOf(longitude));
+                                        databaseReference.child(uploadId).child("password").setValue(password.getText().toString());
 
 
                                         editor.putInt(PROGRESS,1);
