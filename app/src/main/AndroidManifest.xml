@@ -22,7 +22,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+<<<<<<< HEAD
         <activity android:name=".FirebaseComplete"></activity>
+=======
+        <activity android:name=".FullFeed"></activity>
+>>>>>>> 049e53a1f3181edfdc54fe2f631b76ab1fba58d1
         <activity
             android:name=".CompleteAccount"
             android:windowSoftInputMode="stateHidden"></activity>

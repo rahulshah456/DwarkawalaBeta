@@ -1,6 +1,7 @@
 package Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.edward.dwarkawala.FullFeed;
 import com.example.edward.dwarkawala.R;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 
@@ -75,6 +77,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 //            Toast.makeText(ctx, "onClick works!", Toast.LENGTH_SHORT).show();
             Log.d("ImageListAdapter", "onClick works! Position: " + this.getLayoutPosition() + " clicked!");
             //itemListener.recyclerViewListClicked(v, this.getLayoutPosition());
+                Intent intent  = new Intent(mContext, FullFeed.class);
+                intent.putExtra("item_position", getLayoutPosition());
+                mContext.startActivity(intent);
         }
     }
 
@@ -92,6 +97,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
         final String postTitle = String.valueOf(post.getTitle().getRendered());
         holder.title.setText(postTitle);
 
+
         Date date = new Date();
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         try {
@@ -103,6 +109,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
         holder.time.setReferenceTime(date.getTime());
 
 
+<<<<<<< HEAD
 //        int number = post.getFeatured_media();
 //        ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
 //            @Override
@@ -131,6 +138,37 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 //
 //            }
 //        });
+=======
+
+        int number = post.getFeatured_media();
+        ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
+            @Override
+            public void onResponse(Call<Thumbnail> call, retrofit2.Response<Thumbnail> response) {
+
+                Log.d(TAG,String.valueOf(response.body()));
+                Thumbnail newThumbnail = response.body();
+
+
+                if (newThumbnail!=null){
+                    Glide.with(mContext).load(newThumbnail.getSourceUrl())
+                            .thumbnail(0.5f)
+                            .transition(withCrossFade())
+                            .apply(new RequestOptions()
+                                    .centerCrop()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
+                            .into(holder.thumbnail);
+                }
+
+
+
+            }
+
+            @Override
+            public void onFailure(Call<Thumbnail> call, Throwable t) {
+
+            }
+        });
+>>>>>>> 049e53a1f3181edfdc54fe2f631b76ab1fba58d1
 
 
 

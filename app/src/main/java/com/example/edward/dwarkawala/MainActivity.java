@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     public static final String TAG = MainActivity.class.getSimpleName();
+
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private HomePagerAdapter pagerAdapter;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+<<<<<<< HEAD
 
 //        Log.d(TAG,accountData.getName());
 //        Log.d(TAG,accountData.getEmail());
@@ -80,6 +82,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        Log.d(TAG,accountData.getLongitude());
 //        Log.d(TAG,accountData.getPhoneNumber());
 //        Log.d(TAG,accountData.getPassword());
+=======
+/*
+        Log.d(TAG,accountData.getName());
+        Log.d(TAG,accountData.getEmail());
+        Log.d(TAG,accountData.getLatitude());
+        Log.d(TAG,accountData.getLongitude());
+        Log.d(TAG,accountData.getPhoneNumber());
+        Log.d(TAG,accountData.getPassword());*/
+>>>>>>> 049e53a1f3181edfdc54fe2f631b76ab1fba58d1
 
 
 
