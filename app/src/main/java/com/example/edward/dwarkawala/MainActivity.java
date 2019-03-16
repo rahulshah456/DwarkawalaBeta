@@ -74,12 +74,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-        Log.d(TAG,accountData.getName());
-        Log.d(TAG,accountData.getEmail());
-        Log.d(TAG,accountData.getLatitude());
-        Log.d(TAG,accountData.getLongitude());
-        Log.d(TAG,accountData.getPhoneNumber());
-        Log.d(TAG,accountData.getPassword());
+//        Log.d(TAG,accountData.getName());
+//        Log.d(TAG,accountData.getEmail());
+//        Log.d(TAG,accountData.getLatitude());
+//        Log.d(TAG,accountData.getLongitude());
+//        Log.d(TAG,accountData.getPhoneNumber());
+//        Log.d(TAG,accountData.getPassword());
 
 
 
