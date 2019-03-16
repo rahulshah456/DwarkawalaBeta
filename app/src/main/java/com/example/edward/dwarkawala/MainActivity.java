@@ -1,9 +1,11 @@
 package com.example.edward.dwarkawala;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
@@ -16,10 +18,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+
+import java.util.Objects;
 
 import Adapters.HomePagerAdapter;
 import Models.AccountData;
@@ -33,10 +45,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private ImageButton hamNavigation,optionsButton;
     private HomePagerAdapter pagerAdapter;
     private FirebaseAuth mAuth;
     private SharedPreferences preferences;
     public AccountData accountData = null;
+    public  DrawerLayout drawer;
+    public static GoogleApiClient googleApiClient;
 
 
     @Override
@@ -63,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tabLayout = (TabLayout) findViewById(R.id.tabLayoutID);
         tabLayout.setupWithViewPager(viewPager);
         mAuth = FirebaseAuth.getInstance();
+        hamNavigation = (ImageButton) findViewById(R.id.hamButtonID);
+        optionsButton = (ImageButton) findViewById(R.id.optionsButtonID);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
 
@@ -74,6 +92,92 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .requestId()
+                .requestProfile()
+                .build();
+
+
+        googleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                .enableAutoManage(MainActivity.this , new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Log.d(TAG,"GoogleApi can't connect");
+                    }
+                } )
+                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+                .build();
+
+
+
+        hamNavigation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    drawer.openDrawer(GravityCompat.START);
+                }
+
+
+            }
+        });
+
+
+        optionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                PopupMenu popupMenu = new PopupMenu(MainActivity.this,optionsButton);
+                popupMenu.getMenuInflater().inflate(R.menu.menu_main,popupMenu.getMenu());
+
+
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        if (item.getItemId() == R.id.signout_menuID){
+
+                            mAuth.signOut();
+                            Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(@NonNull Status status) {
+                                    Log.d(TAG,"Sign out successfully");
+                                }
+                            });
+
+                            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+
+
+
+
+                        } else if (item.getItemId() == R.id.exit_menuID){
+
+                            finish();
+
+                        }else if (item.getItemId() == R.id.settings_menuID){
+
+                            Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                            startActivity(intent);
+
+                        }
+
+                        return true;
+                    }
+                });
+
+                popupMenu.show();
+
+            }
+        });
+
 
 
 //        Log.d(TAG,accountData.getName());
@@ -83,15 +187,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        Log.d(TAG,accountData.getPhoneNumber());
 //        Log.d(TAG,accountData.getPassword());
 
-/*
-        Log.d(TAG,accountData.getName());
-        Log.d(TAG,accountData.getEmail());
-        Log.d(TAG,accountData.getLatitude());
-        Log.d(TAG,accountData.getLongitude());
-        Log.d(TAG,accountData.getPhoneNumber());
-        Log.d(TAG,accountData.getPassword());*/
-
-
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -99,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
