@@ -67,6 +67,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +77,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import Models.AccountData;
 import id.zelory.compressor.Compressor;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -90,6 +92,7 @@ public class CompleteAccount extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 5;
     private static final int CAPTURE_IMAGE_REQUEST = 10;
     public static final String COMPLETED = "completed";
+    public static final String ACCOUNT_DATA = "AccountData";
     private CardView profilePic, getStarted, googleSync, facebookSync;
     private TextInputEditText name, email, password;
     private ImageView profileImage;
@@ -544,15 +547,17 @@ public class CompleteAccount extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Uri uri) {
 
-                                        databaseReference.child(uploadId).child("name").setValue(name.getText().toString());
-                                        databaseReference.child(uploadId).child("email").setValue(email.getText().toString());
-                                        databaseReference.child(uploadId).child("phoneNumber").setValue(phoneNumber);
-                                        databaseReference.child(uploadId).child("profilePic").setValue(uri.toString());
-                                        databaseReference.child(uploadId).child("latitude").setValue(String.valueOf(latitude));
-                                        databaseReference.child(uploadId).child("longitude").setValue(String.valueOf(longitude));
-                                        databaseReference.child(uploadId).child("password").setValue(password.getText().toString());
+
+                                        AccountData accountData = new AccountData(name.getText().toString(),email.getText().toString(),
+                                                phoneNumber,uri.toString(),String.valueOf(latitude),String.valueOf(longitude),password.getText().toString());
+
+                                        databaseReference.child(uploadId).setValue(accountData);
 
 
+                                        Gson gson = new Gson();
+                                        String accountJson = gson.toJson(accountData);
+                                        editor.putString(ACCOUNT_DATA, accountJson);
+                                        editor.apply();
                                         editor.putInt(PROGRESS,1);
                                         editor.apply();
 

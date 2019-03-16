@@ -1,7 +1,9 @@
 package com.example.edward.dwarkawala;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
@@ -17,8 +19,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 
 import Adapters.HomePagerAdapter;
+import Models.AccountData;
+
+import static com.example.edward.dwarkawala.CompleteAccount.ACCOUNT_DATA;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -28,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ViewPager viewPager;
     private HomePagerAdapter pagerAdapter;
     private FirebaseAuth mAuth;
+    private SharedPreferences preferences;
+    public AccountData accountData = null;
 
 
     @Override
@@ -54,6 +62,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tabLayout = (TabLayout) findViewById(R.id.tabLayoutID);
         tabLayout.setupWithViewPager(viewPager);
         mAuth = FirebaseAuth.getInstance();
+        preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
+
+        Gson gson = new Gson();
+        if (preferences.contains(ACCOUNT_DATA)){
+
+            String accountJson = preferences.getString(ACCOUNT_DATA, "");
+            accountData = gson.fromJson(accountJson, AccountData.class);
+        }
+
+
+
+        Log.d(TAG,accountData.getName());
+        Log.d(TAG,accountData.getEmail());
+        Log.d(TAG,accountData.getLatitude());
+        Log.d(TAG,accountData.getLongitude());
+        Log.d(TAG,accountData.getPhoneNumber());
+        Log.d(TAG,accountData.getPassword());
+
 
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
