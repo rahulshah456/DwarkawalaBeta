@@ -109,7 +109,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
         holder.time.setReferenceTime(date.getTime());
 
 
-<<<<<<< HEAD
 //        int number = post.getFeatured_media();
 //        ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
 //            @Override
@@ -138,7 +137,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 //
 //            }
 //        });
-=======
 
         int number = post.getFeatured_media();
         ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
@@ -168,7 +166,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 
             }
         });
->>>>>>> 049e53a1f3181edfdc54fe2f631b76ab1fba58d1
 
 
 
