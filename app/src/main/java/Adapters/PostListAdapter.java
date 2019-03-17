@@ -109,34 +109,34 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
         holder.time.setReferenceTime(date.getTime());
 
 
-//        int number = post.getFeatured_media();
-//        ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
-//            @Override
-//            public void onResponse(Call<Thumbnail> call, retrofit2.Response<Thumbnail> response) {
-//
-//                Log.d(TAG,String.valueOf(response.body()));
-//                Thumbnail newThumbnail = response.body();
-//
-//
-//                if (newThumbnail!=null){
-//                    Glide.with(mContext).load(newThumbnail.getSourceUrl())
-//                            .thumbnail(0.5f)
-//                            .transition(withCrossFade())
-//                            .apply(new RequestOptions()
-//                                    .centerCrop()
-//                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
-//                            .into(holder.thumbnail);
-//                }
-//
-//
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Thumbnail> call, Throwable t) {
-//
-//            }
-//        });
+        int number = post.getFeatured_media();
+        ImageDataApi.ImageFactory.getInstance().getImageData(number).enqueue(new Callback<Thumbnail>() {
+            @Override
+            public void onResponse(Call<Thumbnail> call, retrofit2.Response<Thumbnail> response) {
+
+                Log.d(TAG,String.valueOf(response.body()));
+                Thumbnail newThumbnail = response.body();
+
+
+                if (newThumbnail!=null){
+                    Glide.with(mContext).load(newThumbnail.getSourceUrl())
+                            .thumbnail(0.5f)
+                            .transition(withCrossFade())
+                            .apply(new RequestOptions()
+                                    .centerCrop()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
+                            .into(holder.thumbnail);
+                }
+
+
+
+            }
+
+            @Override
+            public void onFailure(Call<Thumbnail> call, Throwable t) {
+
+            }
+        });
 
 
 
