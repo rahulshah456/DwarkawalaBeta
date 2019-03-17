@@ -549,7 +549,7 @@ public class CompleteAccount extends AppCompatActivity {
 
 
                                         AccountData accountData = new AccountData(name.getText().toString(),email.getText().toString(),
-                                                phoneNumber,uri.toString(),String.valueOf(latitude),String.valueOf(longitude),password.getText().toString());
+                                                phoneNumber,uri.toString(),String.valueOf(latitude),String.valueOf(longitude));
 
                                         databaseReference.child(uploadId).setValue(accountData);
 

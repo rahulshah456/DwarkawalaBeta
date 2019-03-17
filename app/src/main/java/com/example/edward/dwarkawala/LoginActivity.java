@@ -1,25 +1,35 @@
 package com.example.edward.dwarkawala;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +44,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -61,13 +82,17 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import Models.AccountData;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.example.edward.dwarkawala.CompleteAccount.ACCOUNT_DATA;
 import static com.example.edward.dwarkawala.CompleteAccount.COMPLETED;
+import static com.example.edward.dwarkawala.CompleteAccount.REQUEST_LOCATION;
+import static com.example.edward.dwarkawala.CreateAccountActivity.REQUEST_CODE_ASK_PERMISSIONS;
 import static com.example.edward.dwarkawala.SplashActivity.PROGRESS;
 
 public class LoginActivity extends AppCompatActivity {
@@ -75,32 +100,43 @@ public class LoginActivity extends AppCompatActivity {
     public static final String TAG = LoginActivity.class.getSimpleName();
     private static final String FIREBASE_DATABASE_LOCATION = "Users";
     private static final int RequestSignInCode = 5;
-    public TextInputEditText emailText,password;
-    public CardView loginButton,merchantLogin,facebookLogin,googleLogin,emailLogin;
-    public TextView createNewAccount;
+    public TextInputEditText phoneText,password;
+    public CardView loginButton,merchantLogin,facebookLogin,googleLogin,pintrestLogin,contButton;
+    public TextView createNewAccount,infoText;
+    public ConstraintLayout mainContent,verificationContent;
     private StorageReference storageReference;
     private DatabaseReference databaseReference, accountReference;
     private FirebaseDatabase database;
     private FirebaseUser user;
+    private double latitude = 0;
+    private double longitude = 0;
     private FirebaseAuth mAuth;
     private Dialog progressDialog;
     private AccountData accountData;
-    public String number;
+    public String number,phoneNumberData;
     private String gPassword,gName,gEmail,gProfileUrl;
     public FirebaseUser latestUser;
     private PhoneAuthProvider phoneAuthProvider;
-    public static GoogleApiClient googleApiClient;
+    public static GoogleApiClient googleApiClient,googleLocationClient;
     private boolean mVerificationInProgress = false;
-    private String mVerificationId;
+    private String mVerificationId,num;
+    private FusedLocationProviderClient locationProviderClient;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+    private Boolean inProgress = false;
+    private Boolean isRegistered = false,isRegisteredGoogle = false;
+    private Pinview verificationCode;
+    private TextView resendCode,codeCountdown,numberText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        getWindow().setSoftInputMode(WindowManager.
+                LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             View decor = getWindow().getDecorView();
@@ -116,13 +152,24 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
-        emailText = (TextInputEditText) findViewById(R.id.phoneEditTextID);
-        password = (TextInputEditText) findViewById(R.id.passwordID);
+        ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.CAMERA},
+                REQUEST_CODE_ASK_PERMISSIONS);
+
+
+
+
+
+        phoneText = (TextInputEditText) findViewById(R.id.phoneEditTextID);
+        //password = (TextInputEditText) findViewById(R.id.passwordID);
         loginButton = (CardView) findViewById(R.id.loginID);
         merchantLogin = (CardView) findViewById(R.id.merchantLoginID);
         facebookLogin = (CardView) findViewById(R.id.facebookLoginID);
         googleLogin = (CardView) findViewById(R.id.googleLoginID);
-        emailLogin = (CardView) findViewById(R.id.emailLoginID);
+        pintrestLogin = (CardView) findViewById(R.id.emailLoginID);
+        contButton = (CardView) findViewById(R.id.continueID);
+        infoText = (TextView) findViewById(R.id.infoTextID);
         createNewAccount = (TextView) findViewById(R.id.newAccountID);
 
         storageReference = FirebaseStorage.getInstance().getReference("Users");
@@ -130,13 +177,25 @@ public class LoginActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         mAuth = FirebaseAuth.getInstance();
+        mainContent = (ConstraintLayout) findViewById(R.id.mainContentID);
+        verificationContent = (ConstraintLayout) findViewById(R.id.constraintLayout);
         phoneAuthProvider = PhoneAuthProvider.getInstance();
+        locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
         editor  = preferences.edit();
+
+
+        phoneAuthProvider = PhoneAuthProvider.getInstance();
+        resendCode = (TextView) findViewById(R.id.resendTextID);
+        codeCountdown = (TextView) findViewById(R.id.countdownTextID);
+        verificationCode = (Pinview) findViewById(R.id.otpViewID);
+        numberText = (TextView) findViewById(R.id.numberTextID);
+
 
         progressDialog = new Dialog(this);
         progressDialog.setContentView(R.layout.progress_dialog);
         progressDialog.setCancelable(false);
+
 
 
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -157,6 +216,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
                 .build();
 
+        EnableLocationServices();
 
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -230,15 +290,100 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+
+        phoneText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                num = "+91"+s.toString();
+                Log.d(TAG,num);
+                isRegisteredUser(num);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                progressDialog.show();
-                SignInUser();
+                phoneNumberData  = "+91" + phoneText.getText().toString();
+
+                isRegisteredUser(phoneNumberData);
+                //progressDialog.show();
+
+                if (isRegistered){
+                    //Toast.makeText(LoginActivity.this, "Registered Account!", Toast.LENGTH_SHORT).show();
+                    mainContent.setVisibility(View.GONE);
+                    loginButton.setVisibility(View.GONE);
+                    merchantLogin.setVisibility(View.GONE);
+                    infoText.setVisibility(View.GONE);
+                    verificationContent.setVisibility(View.VISIBLE);
+                    contButton.setVisibility(View.VISIBLE);
+
+                    phoneText.setFocusable(false);
+                    phoneText.setEnabled(false);
+
+
+
+                    //verification code sending
+                    startPhoneNumberVerification(num);
+                    startCountDown(30000);
+
+
+
+                }else {
+
+                    Toast.makeText(LoginActivity.this, "Not Registered!", Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });
+
+
+        resendCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (resendCode.getCurrentTextColor()==getResources().getColor(R.color.colorAccent)){
+
+                    resendVerificationCode(num,mResendToken);
+                    resendCode.setTextColor(getResources().getColor(R.color.light));
+                    startCountDown(30000);
+
+                }else {
+
+                    Snackbar.make(findViewById(android.R.id.content), "Wait till countdown.", Snackbar.LENGTH_SHORT).show();
+
+                }
+
+
+
+            }
+        });
+
+
+        contButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                String code = verificationCode.getValue().toString().trim();
+                verifyPhoneNumberWithCode(mVerificationId,code);
+            }
+        });
+
 
 
         googleLogin.setOnClickListener(new View.OnClickListener() {
@@ -251,15 +396,279 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+        facebookLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Snackbar.make(findViewById(android.R.id.content), "Can't Connect to Facebook.", Snackbar.LENGTH_SHORT).show();
+
+                    }
+                },500);
+
+            }
+        });
+
+
+
+        pintrestLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Snackbar.make(findViewById(android.R.id.content), "Not Available!", Snackbar.LENGTH_SHORT).show();
+
+                    }
+                },500);
+
+            }
+        });
+
+
+
+        merchantLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Intent intent = new Intent(LoginActivity.this,MerchantActivity.class);
+                startActivity(intent);
+
+
+            }
+        });
+
+
+
+        LocationRequest mLocationRequest = LocationRequest.create();
+        mLocationRequest.setInterval(60000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationCallback mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        //TODO: UI updates.
+                    }
+                }
+            }
+        };
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
 
 
     }
 
+
+
+    public void startCountDown(int milliSeconds){
+
+
+        new CountDownTimer(milliSeconds, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+
+                if (millisUntilFinished/1000>=10){
+                    codeCountdown.setText("00:" + millisUntilFinished / 1000);
+                }else {
+                    codeCountdown.setText("00:0" + millisUntilFinished / 1000);
+                }
+
+            }
+
+            public void onFinish() {
+                codeCountdown.setText("00:00");
+                resendCode.setTextColor(getResources().getColor(R.color.colorAccent));
+            }
+        }.start();
+    }
+
+
+    public void isRegisteredGoogleUser(final String email){
+
+        Query query;
+        query = FirebaseDatabase.getInstance().getReference()
+                .child(FIREBASE_DATABASE_LOCATION)
+                .orderByKey();
+        query.keepSynced(true);
+
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    accountData = postSnapshot.getValue(AccountData.class);
+
+                    if (accountData.getEmail().equals(email)){
+                        isRegisteredGoogle = true;
+                        return;
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+
+    public void isRegisteredUser(final String phoneNumber){
+
+
+        Query query;
+        query = FirebaseDatabase.getInstance().getReference()
+                .child(FIREBASE_DATABASE_LOCATION)
+                .orderByKey();
+        query.keepSynced(true);
+
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    accountData = postSnapshot.getValue(AccountData.class);
+
+                    if (accountData.getPhoneNumber().equals(phoneNumber)){
+                        isRegistered = true;
+                        return;
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+
+
+    private boolean checkLocationPermission()
+    {
+        String permission = Manifest.permission.ACCESS_FINE_LOCATION;
+        int res = getApplicationContext().checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void EnableLocationServices() {
+
+        if (googleLocationClient== null){
+            //Initializing GoogleApiClient
+            googleLocationClient = new GoogleApiClient.Builder(LoginActivity.this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            googleLocationClient.connect();
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+
+                            Log.d("Location error","Location error " + connectionResult.getErrorCode());
+                        }
+                    }).build();
+            googleLocationClient.connect();
+
+
+
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
+
+            builder.setAlwaysShow(true);
+
+            PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleLocationClient, builder.build());
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(LoginActivity.this, REQUEST_LOCATION);
+
+
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            }
+                            break;
+                    }
+                }
+            });
+        }
+
+
+    }
+
+
     public void GooglePopup(final FirebaseUser newUser) {
 
-        final TextInputEditText password, phoneNumber;
+
+        if (checkLocationPermission()){
+            LocationServices.getFusedLocationProviderClient(LoginActivity.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    //TODO: UI updates.
+                    if (location!=null){
+                        longitude = location.getLongitude();
+                        latitude = location.getLatitude();
+                    }
+
+                }
+            });
+        }
+
+
+        final TextInputEditText phoneNumber;
         ImageView profilePic;
         TextView name, email, buttonText;
         final Pinview verificationCode;
@@ -272,7 +681,7 @@ public class LoginActivity extends AppCompatActivity {
         Objects.requireNonNull(playlistDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         playlistDialog.setCancelable(false);
 
-        password = (TextInputEditText) playlistDialog.findViewById(R.id.passwordEditTextID);
+
         phoneNumber = (TextInputEditText) playlistDialog.findViewById(R.id.phoneEditTextID);
         profilePic = (ImageView) playlistDialog.findViewById(R.id.profileImageView);
         name = (TextView) playlistDialog.findViewById(R.id.profileNameID);
@@ -292,8 +701,6 @@ public class LoginActivity extends AppCompatActivity {
                 String code = verificationCode.getValue().toString().trim();
                 verifyPhoneNumberWithCode(mVerificationId, code);
 
-                gPassword = password.getText().toString();
-
 
 
             }
@@ -312,21 +719,30 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-
         verify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 number = "+91" + phoneNumber.getText().toString().trim();
 
-                startPhoneNumberVerification(number);
-                verificationView.setVisibility(View.VISIBLE);
-                verificationCode.requestFocus();
-                //startCountDown(30000);
+                if (phoneNumber.getText().length()>=10){
+
+                    startPhoneNumberVerification(number);
+                    verificationView.setVisibility(View.VISIBLE);
+                    verificationCode.requestFocus();
+                    //startCountDown(30000);
+                    verify.setVisibility(View.GONE);
+                    cont.setVisibility(View.VISIBLE);
+
+                }else {
+
+                    phoneNumber.setError("Invalid Number!");
+                }
 
 
-                verify.setVisibility(View.GONE);
-                cont.setVisibility(View.VISIBLE);
+
+
+
 
 
             }
@@ -381,10 +797,13 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success");
 
                             FirebaseUser user = task.getResult().getUser();
+
+                            num = String.valueOf(user.getPhoneNumber());
+
                             Log.d(TAG,String.valueOf(user.getPhoneNumber()));
 
 
-
+                            progressDialog.show();
                             editor.putInt(PROGRESS,1);
                             editor.apply();
                             CreateNewUserTask newUserTask = new CreateNewUserTask();
@@ -428,6 +847,22 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         }
+
+
+        if (requestCode == REQUEST_LOCATION) {
+            // Check for the integer request code originally supplied to startResolutionForResult()
+
+            if (resultCode == RESULT_OK) {
+
+                Log.d(TAG, "Location Services:ENABLED");
+
+            } else {
+
+                Log.d(TAG, "Location Services:DISABLED");
+                finish();
+
+            }
+        }
     }
 
 
@@ -445,6 +880,8 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
+        isRegisteredGoogleUser(account.getEmail());
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -452,16 +889,29 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (AuthResultTask.isSuccessful()){
 
+                            inProgress = true;
+
                             // Getting Current Login user details.
                             FirebaseUser user = mAuth.getCurrentUser();
                             String userId = mAuth.getCurrentUser().getUid();
 
-                            progressDialog.dismiss();
+                            if (isRegisteredGoogle){
 
-                            gEmail = user.getEmail();
-                            gName = user.getDisplayName();
-                            gProfileUrl = String.valueOf(user.getPhotoUrl());
-                            GooglePopup(user);
+                                CompleteUserTask completeUserTask = new CompleteUserTask();
+                                completeUserTask.execute();
+
+                            }else {
+
+                                progressDialog.dismiss();
+                                gEmail = user.getEmail();
+                                gName = user.getDisplayName();
+                                gProfileUrl = String.valueOf(user.getPhotoUrl());
+                                GooglePopup(user);
+                            }
+
+
+
+
 
 
 
@@ -474,61 +924,71 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void SignInUser(){
 
-
-        mAuth.signInWithEmailAndPassword(emailText.getText().toString(),password.getText().toString())
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                        Log.d(TAG,"Login Failed");
-                        progressDialog.dismiss();
-                        Snackbar.make(findViewById(android.R.id.content), "Login Failed!", Snackbar.LENGTH_SHORT).show();
-
-                    }
-                })
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-
-
-                        Log.d(TAG,"Login Success");
-                        progressDialog.dismiss();
-
-                        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-
-
-
-                    }
-                });
-
-
-    }
-
-
-
-    public class CreateNewUserTask extends AsyncTask {
+    public class CompleteUserTask extends AsyncTask {
 
 
         @Override
         protected Object doInBackground(Object[] objects) {
 
-                final String uploadId = databaseReference.push().getKey();
 
-                AccountData accountData = new AccountData(gName,gEmail,
-                    number ,gProfileUrl,String.valueOf(77.215),String.valueOf(44.6654),gPassword);
+            Query query;
+            query = FirebaseDatabase.getInstance().getReference()
+                    .child(FIREBASE_DATABASE_LOCATION)
+                    .orderByKey();
+            query.keepSynced(true);
 
-                databaseReference.child(uploadId).setValue(accountData);
 
-                Gson gson = new Gson();
-                String accountJson = gson.toJson(accountData);
-                editor.putString(ACCOUNT_DATA, accountJson);
-                editor.apply();
-                editor.putInt(PROGRESS,1);
-                editor.apply();
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        accountData = postSnapshot.getValue(AccountData.class);
+
+
+                        if (isRegistered){
+
+                            if (accountData.getPhoneNumber().equals(num)){
+
+                                Gson gson = new Gson();
+                                String accountJson = gson.toJson(accountData);
+                                editor.putString(ACCOUNT_DATA, accountJson);
+                                editor.apply();
+                                editor.putInt(PROGRESS,1);
+                                editor.apply();
+                                inProgress = false;
+                                progressDialog.dismiss();
+                            }
+                        }
+
+                        if (isRegisteredGoogle){
+
+                            if (accountData.getEmail().equals(mAuth.getCurrentUser().getEmail())){
+
+                                Gson gson = new Gson();
+                                String accountJson = gson.toJson(accountData);
+                                editor.putString(ACCOUNT_DATA, accountJson);
+                                editor.apply();
+                                editor.putInt(PROGRESS,1);
+                                editor.apply();
+                                inProgress = false;
+                                progressDialog.dismiss();
+                            }
+                        }
+
+
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
 
 
@@ -539,7 +999,41 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
+            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+    }
 
+
+    public class CreateNewUserTask extends AsyncTask {
+
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+                final String uploadId = databaseReference.push().getKey();
+                Log.d(TAG,"PhoneNumber:" + num);
+                AccountData accountData = new AccountData(gName,gEmail, num,gProfileUrl,String.valueOf(latitude),String.valueOf(longitude));
+                databaseReference.child(uploadId).setValue(accountData);
+
+
+                Gson gson = new Gson();
+                String accountJson = gson.toJson(accountData);
+                editor.putString(ACCOUNT_DATA, accountJson);
+                editor.apply();
+                editor.putInt(PROGRESS,1);
+                editor.apply();
+
+            return COMPLETED;
+        }
+
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            progressDialog.dismiss();
 
             Intent intent = new Intent(LoginActivity.this,MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -548,4 +1042,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 }

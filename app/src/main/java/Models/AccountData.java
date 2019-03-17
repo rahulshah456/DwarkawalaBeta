@@ -24,17 +24,6 @@ public class AccountData {
         this.longitude = longitude;
     }
 
-
-    public AccountData(String name, String email, String phoneNumber, String profilePic, String latitude, String longitude, String password) {
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.profilePic = profilePic;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.password = password;
-    }
-
     public AccountData(String name, String email, String phoneNumber, String profilePic) {
         this.name = name;
         this.email = email;

@@ -44,7 +44,7 @@ import static com.example.edward.dwarkawala.SplashActivity.PROGRESS;
 public class CreateAccountActivity extends AppCompatActivity {
 
     public static final String TAG  = CreateAccountActivity.class.getSimpleName();
-    private static final int REQUEST_CODE_ASK_PERMISSIONS = 55;
+    public static final int REQUEST_CODE_ASK_PERMISSIONS = 55;
     private TextInputEditText phoneNumberText;
     private CardView sendOtp,continueBtn;
     private ConstraintLayout verificationView;
