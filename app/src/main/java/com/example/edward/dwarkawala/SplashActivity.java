@@ -67,6 +67,14 @@ public class SplashActivity extends AppCompatActivity {
                                 intent_two.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent_two);
                                 break;
+                            case 3:
+                                //User successfully completed registration
+                                Intent intent_three = new Intent(SplashActivity.this,CompleteMerchant.class);
+                                intent_three.putExtra("phone",mAuth.getCurrentUser().getPhoneNumber());
+                                intent_three.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent_three);
+                                break;
+
                         }
 
                     }else {

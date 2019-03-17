@@ -60,6 +60,7 @@ public class CreateAccountActivity extends AppCompatActivity {
     private static final int STATE_SIGNIN_FAILED = 5;
     private static final int STATE_SIGNIN_SUCCESS = 6;
     private FirebaseAuth mAuth;
+    private String type;
     private boolean mVerificationInProgress = false;
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
@@ -89,6 +90,9 @@ public class CreateAccountActivity extends AppCompatActivity {
 //                decor.setSystemUiVisibility(0);
 //            }
         }
+
+        Intent i = getIntent();
+        type = i.getExtras().getString("type");
 
         ActivityCompat.requestPermissions(CreateAccountActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -334,13 +338,28 @@ public class CreateAccountActivity extends AppCompatActivity {
                             FirebaseUser user = task.getResult().getUser();
                             Log.d(TAG,String.valueOf(user.getPhoneNumber()));
 
-                            editor.putInt(PROGRESS,0);
-                            editor.apply();
+                            if (type.equals("merchant")){
 
-                            Intent intent = new Intent(CreateAccountActivity.this,CompleteAccount.class);
-                            intent.putExtra("phone",user.getPhoneNumber());
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
+                                Intent intent = new Intent(CreateAccountActivity.this,CompleteMerchant.class);
+                                intent.putExtra("phone",user.getPhoneNumber());
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+
+                                editor.putInt(PROGRESS,3);
+                                editor.apply();
+                            }else {
+
+                                Intent intent = new Intent(CreateAccountActivity.this,CompleteAccount.class);
+                                intent.putExtra("phone",user.getPhoneNumber());
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+
+
+                                editor.putInt(PROGRESS,0);
+                                editor.apply();
+                            }
+
+
 
 
                         } else {

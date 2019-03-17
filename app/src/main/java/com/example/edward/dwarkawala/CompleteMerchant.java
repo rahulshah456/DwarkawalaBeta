@@ -1,7 +1,6 @@
 package com.example.edward.dwarkawala;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,7 +18,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -41,7 +39,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -57,10 +54,8 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -73,11 +68,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 import Models.AccountData;
+import Models.MerchantData;
 import id.zelory.compressor.Compressor;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -86,15 +81,16 @@ import io.reactivex.schedulers.Schedulers;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.example.edward.dwarkawala.SplashActivity.PROGRESS;
 
-public class CompleteAccount extends AppCompatActivity {
+public class CompleteMerchant extends AppCompatActivity {
 
-    public static final String TAG = CompleteAccount.class.getSimpleName();
+    public static final String TAG = CompleteMerchant.class.getSimpleName();
     private static final int PICK_IMAGE_REQUEST = 5;
     private static final int CAPTURE_IMAGE_REQUEST = 10;
     public static final String COMPLETED = "completed";
     public static final String ACCOUNT_DATA = "AccountData";
+    private static final String MERCHANT_DATA = "MerchantData";
     private CardView profilePic, getStarted, googleSync, facebookSync;
-    private TextInputEditText name, email, password;
+    private TextInputEditText name, email,shopName,shopAddress;
     private ImageView profileImage;
     private Bundle bundle;
     private TextView phone;
@@ -121,11 +117,10 @@ public class CompleteAccount extends AppCompatActivity {
     private GoogleApiClient googleApiClient;
     final static int REQUEST_LOCATION = 199;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_complete_account);
+        setContentView(R.layout.activity_create_merchant);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             View decor = getWindow().getDecorView();
@@ -140,6 +135,7 @@ public class CompleteAccount extends AppCompatActivity {
 //            }
         }
 
+
         bundle = getIntent().getExtras();
         mAuth = FirebaseAuth.getInstance();
         locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -151,16 +147,17 @@ public class CompleteAccount extends AppCompatActivity {
         facebookSync = (CardView) findViewById(R.id.facebookLoginID);
         name = (TextInputEditText) findViewById(R.id.nameEditTextID);
         email = (TextInputEditText) findViewById(R.id.emailEditTextID);
-        password = (TextInputEditText) findViewById(R.id.passwordEditTextID);
-        storageReference = FirebaseStorage.getInstance().getReference("Users");
-        databaseReference = FirebaseDatabase.getInstance().getReference("Users");
+        shopName = (TextInputEditText) findViewById(R.id.shopEditTextID);
+        shopAddress = (TextInputEditText) findViewById(R.id.addressEditTextID);
+        storageReference = FirebaseStorage.getInstance().getReference("Merchants");
+        databaseReference = FirebaseDatabase.getInstance().getReference("Merchants");
         database = FirebaseDatabase.getInstance();
         compressImageTask = new CompressImageTask();
         createNewUserTask = new CreateNewUserTask();
         progressDialog = new Dialog(this);
         progressDialog.setContentView(R.layout.progress_dialog);
         progressDialog.setCancelable(false);
-        preferences = PreferenceManager.getDefaultSharedPreferences(CompleteAccount.this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(CompleteMerchant.this);
         editor = preferences.edit();
 
 
@@ -188,7 +185,7 @@ public class CompleteAccount extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                if (TextUtils.isEmpty(name.getText()) || TextUtils.isEmpty(email.getText()) || TextUtils.isEmpty(password.getText())) {
+                if (TextUtils.isEmpty(name.getText()) || TextUtils.isEmpty(email.getText()) || TextUtils.isEmpty(shopName.getText()) || TextUtils.isEmpty(shopAddress.getText()) ) {
 
                     Snackbar.make(findViewById(android.R.id.content), "Please fill all details!", Snackbar.LENGTH_SHORT).show();
                     if (TextUtils.isEmpty(name.getText())) {
@@ -197,8 +194,11 @@ public class CompleteAccount extends AppCompatActivity {
                     if (TextUtils.isEmpty(email.getText())) {
                         email.setError("Email cannot be empty");
                     }
-                    if (TextUtils.isEmpty(password.getText())) {
-                        password.setError("Password cannot be empty");
+                    if (TextUtils.isEmpty(shopName.getText())) {
+                        shopName.setError("Shop name cannot be empty");
+                    }
+                    if (TextUtils.isEmpty(shopAddress.getText())) {
+                        shopAddress.setError("Address cannot be empty");
                     }
 
                 } else {
@@ -206,11 +206,6 @@ public class CompleteAccount extends AppCompatActivity {
                     if (!isEmailValid(email.getText())) {
                         Snackbar.make(findViewById(android.R.id.content), "Please enter correct email address!", Snackbar.LENGTH_SHORT).show();
                         email.setError("Email not valid");
-                        return;
-                    }
-                    if (password.getText().length() < 5) {
-                        Snackbar.make(findViewById(android.R.id.content), "Password must contain more than 5 characters!", Snackbar.LENGTH_SHORT).show();
-                        password.setError("Password not valid");
                         return;
                     }
                     if (compressImageTask.getStatus() == AsyncTask.Status.FINISHED) {
@@ -227,7 +222,7 @@ public class CompleteAccount extends AppCompatActivity {
 
 
                             if (checkLocationPermission()){
-                                LocationServices.getFusedLocationProviderClient(CompleteAccount.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                                LocationServices.getFusedLocationProviderClient(CompleteMerchant.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                                     @Override
                                     public void onSuccess(Location location) {
                                         //TODO: UI updates.
@@ -289,6 +284,10 @@ public class CompleteAccount extends AppCompatActivity {
         }
         locationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
 
+
+
+
+
     }
 
 
@@ -336,7 +335,7 @@ public class CompleteAccount extends AppCompatActivity {
         if (googleApiClient == null) {
 
             //Initializing GoogleApiClient
-            googleApiClient = new GoogleApiClient.Builder(CompleteAccount.this)
+            googleApiClient = new GoogleApiClient.Builder(CompleteMerchant.this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                         @Override
@@ -379,7 +378,7 @@ public class CompleteAccount extends AppCompatActivity {
                             try {
                                 // Show the dialog by calling startResolutionForResult(),
                                 // and check the result in onActivityResult().
-                                status.startResolutionForResult(CompleteAccount.this, REQUEST_LOCATION);
+                                status.startResolutionForResult(CompleteMerchant.this, REQUEST_LOCATION);
 
 
                             } catch (IntentSender.SendIntentException e) {
@@ -471,10 +470,10 @@ public class CompleteAccount extends AppCompatActivity {
         @Override
         protected Uri doInBackground(File... files) {
             if (actualImage == null) {
-                Toast.makeText(CompleteAccount.this,"Please choose an image!",Toast.LENGTH_LONG).show();
+                Toast.makeText(CompleteMerchant.this,"Please choose an image!",Toast.LENGTH_LONG).show();
             } else {
                 // Compress image in main thread using custom Compressor
-                new Compressor(CompleteAccount.this)
+                new Compressor(CompleteMerchant.this)
                         .compressToFileAsFlowable(actualImage)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -488,13 +487,13 @@ public class CompleteAccount extends AppCompatActivity {
                             @Override
                             public void accept(Throwable throwable) {
                                 throwable.printStackTrace();
-                                Toast.makeText(CompleteAccount.this,throwable.getMessage(),Toast.LENGTH_LONG).show();
+                                Toast.makeText(CompleteMerchant.this,throwable.getMessage(),Toast.LENGTH_LONG).show();
                             }
                         });
                 try {
 
 
-                    compressedImage = new Compressor(CompleteAccount.this)
+                    compressedImage = new Compressor(CompleteMerchant.this)
                             .setMaxWidth(1024)
                             .setMaxHeight(768)
                             .setQuality(60)
@@ -502,11 +501,11 @@ public class CompleteAccount extends AppCompatActivity {
                             .setDestinationDirectoryPath(Environment.getExternalStorageDirectory().getAbsolutePath())
                             .compressToFile(actualImage);
 
-                    custom = getImageContentUri(CompleteAccount.this,compressedImage);
+                    custom = getImageContentUri(CompleteMerchant.this,compressedImage);
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(CompleteAccount.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(CompleteMerchant.this,e.getMessage(),Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -542,15 +541,16 @@ public class CompleteAccount extends AppCompatActivity {
                                     public void onSuccess(Uri uri) {
 
 
-                                        AccountData accountData = new AccountData(name.getText().toString(),email.getText().toString(),
-                                                phoneNumber,uri.toString(),String.valueOf(latitude),String.valueOf(longitude));
+                                        MerchantData merchantData = new MerchantData(name.getText().toString(),email.getText().toString(),
+                                                phoneNumber,String.valueOf(uri),String.valueOf(latitude),
+                                                String.valueOf(longitude),shopAddress.getText().toString(),shopName.getText().toString());
 
-                                        databaseReference.child(uploadId).setValue(accountData);
+                                        databaseReference.child(uploadId).setValue(merchantData);
 
 
                                         Gson gson = new Gson();
-                                        String accountJson = gson.toJson(accountData);
-                                        editor.putString(ACCOUNT_DATA, accountJson);
+                                        String accountJson = gson.toJson(merchantData);
+                                        editor.putString(MERCHANT_DATA, accountJson);
                                         editor.apply();
                                         editor.putInt(PROGRESS,1);
                                         editor.apply();
@@ -598,7 +598,7 @@ public class CompleteAccount extends AppCompatActivity {
 
             progressDialog.dismiss();
 
-            Intent intent = new Intent(CompleteAccount.this,MainActivity.class);
+            Intent intent = new Intent(CompleteMerchant.this,MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
@@ -633,7 +633,7 @@ public class CompleteAccount extends AppCompatActivity {
 
         TextView camera,gallery;
 
-        final Dialog playlistDialog = new Dialog(CompleteAccount.this);
+        final Dialog playlistDialog = new Dialog(CompleteMerchant.this);
         playlistDialog.setContentView(R.layout.profile_popup);
         Objects.requireNonNull(playlistDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         playlistDialog.setCancelable(true);
@@ -720,6 +720,7 @@ public class CompleteAccount extends AppCompatActivity {
     boolean isEmailValid(CharSequence email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
+
 
 
 }
