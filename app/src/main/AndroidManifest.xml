@@ -22,7 +22,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CompleteMerchant"></activity>
+        <activity android:name=".ShopActivity"></activity>
+        <activity android:name=".CompleteMerchant" />
         <activity android:name=".MerchantActivity" />
         <activity
             android:name=".SettingsActivity"

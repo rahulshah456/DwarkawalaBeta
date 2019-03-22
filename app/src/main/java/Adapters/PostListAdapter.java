@@ -38,21 +38,22 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
 
 
     private static final String TAG = PostListAdapter.class.getSimpleName();
-    private static RecyclerViewClickListener itemListener;
-    private static SwipeRefreshLayout swipeRefreshLayout;
     Context mContext;
 
     public PostListAdapter(Context context) {
         mContext = context;
-        //this.itemListener = itemListener;
     }
 
-    public interface RecyclerViewClickListener
-    {
-        public void recyclerViewListClicked(View v, int position);
+
+    @Override
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final View itemView = LayoutInflater.from(mContext).inflate(R.layout.feed_item, parent, false);
+        return new MyViewHolder(itemView);
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
         public TextView title;
         public RelativeTimeTextView time;
         public ImageView thumbnail;
@@ -81,13 +82,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.MyView
                 intent.putExtra("item_position", getLayoutPosition());
                 mContext.startActivity(intent);
         }
-    }
-
-
-    @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View itemView = LayoutInflater.from(mContext).inflate(R.layout.feed_item, parent, false);
-        return new MyViewHolder(itemView);
     }
 
     @Override
