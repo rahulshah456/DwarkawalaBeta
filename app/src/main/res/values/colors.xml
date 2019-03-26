@@ -9,4 +9,6 @@
     <color name="greenPressed">#00BFA5</color>
     <color name="transparent">#90000000</color>
     <color name="grey">#9E9E9E</color>
+
+    <color name="greencolor">#60C3AD</color>
 </resources>
