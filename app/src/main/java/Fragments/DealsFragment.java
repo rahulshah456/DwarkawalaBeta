@@ -111,10 +111,10 @@ public class DealsFragment extends Fragment {
 
                     merchantDataList.add(merchantData);
                     //Collections.reverse(wallpaperList);
-                    imageListAdaper.addAll(merchantDataList);
 
 
                 }
+                imageListAdaper.addAll(merchantDataList);
 
             }
 
