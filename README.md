@@ -6,12 +6,12 @@ recommendations and news feed as per your requested intrests. Grab easy discount
 # Login Setup
 User can login with phone number and via google, facebook and pintrest
 
-![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/screenshot_20190322-215802%20(1).png)
-![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/Webp.net-resizeimage.png)
+![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/login.png)
+![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/loginSode.png)
 
 
 # News Feed & Nearby Shops
 News feed includes all daily updates directly from dwarkawala community.
 
-![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/Webp.net-resizeimage%20(2).png)
-![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/Webp.net-resizeimage%20(1).png)
+![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/home.png)
+![alt text](https://github.com/rahulshah456/DwarkawalaBeta/blob/master/screenshots/nearby.png)
